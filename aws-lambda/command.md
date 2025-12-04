@@ -110,6 +110,39 @@ aws --endpoint-url=http://localhost:4566 \
     --handler index.handler
 ```
 
+- Delete the AWS Lambda function in LocalStack.
+
+```bash
+aws --endpoint-url=http://localhost:4566 \
+    --region us-east-1 \
+    lambda \
+    delete-function \
+    --function-name ban-xrs-get-parameter
+```
+
+- Delete the DynamoDB table in LocalStack.
+
+```bash 
+aws --endpoint-url=http://localhost:4566 \
+  --region us-east-1 \
+  dynamodb delete-table \
+  --table-name Parameters
+```
+
+- Execute cURL command to invoke the AWS Lambda function in LocalStack via API Gateway.
+
+```bash
+curl -X POST "http://localhost:4566/restapis/{api-id}/{stage}/_myresource" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+- Execute HTTP request using Spring Java WebFlux.
+
+```bash
+curl http://localhost:8080/lambda/MY_PARAM
+```
+
 ### Author
 - [Raul R. Bolivar Navas](https://rasysbox.com)
 - GitHub: [@raulrobinson](https://github.com/raulrobinson)
