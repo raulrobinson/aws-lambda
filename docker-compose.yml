@@ -1,0 +1,39 @@
+services:
+
+  # [LocalStack](https://localstack.cloud/)
+  # es una plataforma de pruebas para servicios de AWS
+  localstack:
+    container_name: localstack-lambda-dynamodb
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"             # endpoint único para todos los servicios
+      - "4510-4559:4510-4559"   # puertos para servicios individuales
+      - "4571:4571"             # Optional: edge port for Lambda
+    environment:
+      - SERVICES=lambda,dynamodb
+      - DEBUG=1                                   # habilita el modo de depuración
+      - PERSISTENCE=1                             # almacenamiento persistente
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}  # requerido para Pro
+      - AWS_DEFAULT_REGION=us-east-1              # región por defecto
+      - AWS_ACCESS_KEY_ID=test                    # credenciales de prueba
+      - AWS_SECRET_ACCESS_KEY=test,               # credenciales de prueba
+      - DISABLE_CORS_CHECKS=1                     # HABILITA CORS para llamadas directas
+    volumes:
+      - "localstack-data:/var/lib/localstack"   # almacenamiento persistente recomendado
+      - "/var/run/docker.sock:/var/run/docker.sock"     # necesario para Lambda y otros
+
+  # [DynamoDB Admin]() es una interfaz web para administrar DynamoDB
+  # permite ver y editar tablas, ítems, etc.
+  # puedes acceder a ella en http://localhost:8001
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    container_name: dynamodb-admin-lambda-dynamodb
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://host.docker.internal:4566
+    depends_on:
+      - localstack
+
+volumes:
+  localstack-data:
